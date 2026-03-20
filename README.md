@@ -6,5 +6,6 @@
 ## 准备
 
 - [仿真](docs/sim.md)
+  - [ManiSkill 仿真](docs/sim_mk.md)
 - [软件](docs/sw.md)
 - [硬件](docs/hw.md)
