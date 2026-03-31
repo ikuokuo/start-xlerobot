@@ -5,7 +5,8 @@
 
 ## 准备
 
-- [仿真](docs/sim.md)
+- 仿真：[文档](https://xlerobot.readthedocs.io/zh-cn/latest/simulation/index.html)
   - [ManiSkill 仿真](docs/sim_mk.md)
-- [硬件](docs/hw.md)
-- [软件](docs/sw.md)
+- 硬件：[文档](https://xlerobot.readthedocs.io/zh-cn/latest/hardware/index.html)
+  - [硬件组装](docs/hw_assemble.md)
+- 软件：[文档](https://xlerobot.readthedocs.io/zh-cn/latest/software/index.html)
