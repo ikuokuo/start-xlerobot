@@ -1,12 +1,21 @@
 # 安装 LeRobot
 
-- OS: Ubuntu 24.04
+- OS: Ubuntu 24.04 / 18.04
 
 ## 安装 LeRobot 环境
 
 - [官方安装指南](https://huggingface.co/docs/lerobot/installation)
 
-创建 Conda 环境，见[这里](./sim_mk.md)。建议新建，不然可能有依赖冲突。
+- [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
+  - Jetson TX2: `wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh`
+
+创建 Conda 环境，
+
+```bash
+conda create -n lerobot python=3.12
+```
+
+建议新建，与仿真独立，不然可能有依赖冲突。
 
 ```bash
 conda activate lerobot
