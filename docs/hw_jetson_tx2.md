@@ -157,7 +157,7 @@ ps aux | grep vino
 
 主机，则用 Remmina VNC 连接。
 
-> 注: USB 连接的 L4T-README 里有 README-vnc.txt 做了说明。
+> 注: USB 连接的 L4T-README 盘里有 README-vnc.txt 等说明。
 
 <!--
 xrandr --fb 1280 800
@@ -169,4 +169,68 @@ xrandr --fb 1280 800
 
 ## 软件环境
 
-见『[准备/软件](../README.md)』。
+Jetson TX2 上 conda 用 miniforge 发行版，
+
+```bash
+wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh
+```
+
+见『[准备/软件](../README.md)』，安装 Robot 环境。
+
+但发现依赖问题，如 torch 版本达不到 LeRobot 要求。
+
+故选择 [jetson-containers](https://github.com/dusty-nv/jetson-containers) 容器环境，再准备软件环境。
+
+### 容器环境
+
+安装 jetson-containers，
+
+```bash
+git clone --depth 1 https://github.com/dusty-nv/jetson-containers
+bash jetson-containers/install.sh
+```
+
+依照 [System Setup](https://github.com/dusty-nv/jetson-containers/blob/master/docs/setup.md) 配置 Docker daemon 等。
+
+PyTorch 环境，
+
+```bash
+jetson-containers run $(autotag l4t-pytorch)
+# 若挂载主机目录
+jetson-containers run $(autotag l4t-pytorch) -v $HOME/Codes:/home/codes
+```
+
+ROS2 环境，
+
+```bash
+jetson-containers run $(autotag ros:foxy-pytorch-l4t)
+# 若挂载主机目录
+docker run -it --name ros \
+-v $HOME/Codes:/home/codes \
+dustynv/ros:foxy-pytorch-l4t-r32.7.1
+
+# 检查环境
+$ python3 - <<-EOF
+import platform
+import torch
+print(f" Python: {platform.python_version()}")
+print(f"PyTorch: {torch.__version__}")
+print(f"   CUDA: {torch.version.cuda} en={torch.cuda.is_available()}")
+EOF
+ Python: 3.6.9
+PyTorch: 1.10.0
+   CUDA: 10.2 en=True
+```
+<!--
+docker start ros
+docker exec -it ros bash
+-->
+更多参考 [jetbot_ros](https://github.com/dusty-nv/jetbot_ros)。
+
+安装 ffmpeg，
+
+```bash
+apt update -y
+apt install -y ffmpeg
+```

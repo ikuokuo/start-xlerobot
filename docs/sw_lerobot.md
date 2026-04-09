@@ -1,13 +1,11 @@
 # 安装 LeRobot
 
-- OS: Ubuntu 24.04 / 18.04
+- OS: Ubuntu 24.04
 
 ## 安装 LeRobot 环境
 
 - [官方安装指南](https://huggingface.co/docs/lerobot/installation)
-
-- [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
-  - Jetson TX2: `wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh`
+  - [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
 
 创建 Conda 环境，
 
@@ -23,6 +21,8 @@ conda activate lerobot
 conda install ffmpeg -c conda-forge
 ffmpeg -version  # ffmpeg version 8.0
 ffmpeg -encoders | grep libsvtav1  # libsvtav1 check supported
+# or,
+# sudo apt install ffmpeg
 ```
 
 ```bash
