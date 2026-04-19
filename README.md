@@ -14,3 +14,7 @@
 - 软件：[文档](https://xlerobot.readthedocs.io/zh-cn/latest/software/index.html)
   - [安装 LeRobot](docs/sw_lerobot.md)
   - [手臂控制](docs/sw_arm.md)
+
+## 方案
+
+- 2026-03 / [The Open-Source Recipe for Teaching a Robot to Fold Your Clothes](https://huggingface.co/spaces/lerobot/robot-folding)
