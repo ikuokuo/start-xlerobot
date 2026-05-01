@@ -1,6 +1,13 @@
 
 # 手臂控制
 
+- OS: Ubuntu 24.04
+
+```bash
+conda activate lerobot
+cd lerobot
+```
+
 ## 键盘关节控制
 
 ```bash
@@ -44,6 +51,10 @@ python examples/3_so100_yolo_ee_follow.py
 ```
 
 ![](img/sw_arm_follow.png)
+
+## 更多资料
+
+- [手臂标定](https://huggingface.co/docs/lerobot/so101#calibrate)
 
 ## 问题：控制不了？
 

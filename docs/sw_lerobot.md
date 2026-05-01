@@ -49,5 +49,6 @@ export LR_DIR=`pwd`/lerobot
 # 软链接 XLeRobot 资源
 ln -s $XR_DIR/software/src/model/SO101Robot.py $LR_DIR/src/lerobot/model/
 ln -s $XR_DIR/software/src/robots/xlerobot $LR_DIR/src/lerobot/robots/
+ln -s $XR_DIR/software/src/robots/xlerobot_2wheels $LR_DIR/src/lerobot/robots/
 ln -s $XR_DIR/software/examples/* $LR_DIR/examples/
 ```

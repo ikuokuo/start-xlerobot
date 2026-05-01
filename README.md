@@ -14,6 +14,7 @@
 - 软件：[文档](https://xlerobot.readthedocs.io/zh-cn/latest/software/index.html)
   - [安装 LeRobot](docs/sw_lerobot.md)
   - [手臂控制](docs/sw_arm.md)
+  - [遥操作](docs/sw_teleop.md)
 
 ## 方案
 
