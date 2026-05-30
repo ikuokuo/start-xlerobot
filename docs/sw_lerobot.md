@@ -43,6 +43,8 @@ pip install gymnasium==0.29.1
 ## 安装 XLeRobot 资源
 
 ```bash
+git clone --depth 1 https://github.com/Vector-Wangel/XLeRobot.git
+
 export XR_DIR=`pwd`/XLeRobot
 export LR_DIR=`pwd`/lerobot
 

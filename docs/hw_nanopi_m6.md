@@ -27,14 +27,14 @@ ps -aux | grep ssh
 还可设置无头模式，不依赖 HDMI 显示，
 
 ```bash
-# GNOME Remote Desktop
+# GNOME Remote Desktop (RDP + VNC)
 #  https://github.com/GNOME/gnome-remote-desktop
 
 # 生成 TLS 证书
 mkdir -p ~/.local/share/gnome-remote-desktop/
 openssl req -new -newkey rsa:4096 -days 720 -nodes -x509 -subj /C=SE/ST=NONE/L=NONE/O=IKUOKUO/CN=NanoPi-M6 -out ~/.local/share/gnome-remote-desktop/tls.crt -keyout ~/.local/share/gnome-remote-desktop/tls.key
 
-# 配置
+# 配置 RDP (VNC 见上述 github 地址下官方文档)
 grdctl --headless rdp set-tls-key ~/.local/share/gnome-remote-desktop/tls.key
 grdctl --headless rdp set-tls-cert ~/.local/share/gnome-remote-desktop/tls.crt
 grdctl --headless rdp set-credentials pi pi
@@ -43,6 +43,8 @@ grdctl --headless rdp enable
 # 启动
 systemctl --user enable --now gnome-remote-desktop-headless.service
 ```
+
+主机用 Remmina 配置 RDP 连接时，分辨率可 Custom 指定。
 
 另外，如下挂载 M.2 NVMe 硬盘，
 
@@ -78,6 +80,19 @@ lsblk
 df -h
 ```
 
+若要设置中文输入法（自带 IBus），
+
+- 安装中文语言包和拼音引擎，并重启 IBus 输入法框架使得安装生效
+
+  ```bash
+  sudo apt install ibus-libpinyin language-pack-zh-hans
+  ibus-daemon -drx
+  ```
+
+- 系统设置中添加中文输入源
+  - 打开 Settings -> Keyboard，点击 Input Sources 下 “+” 按钮
+  - 弹窗里点击: Chinese -> Chinese (Intelligent Pinyin) -> 右上 Add
+
 ## 硬件连线
 
 把 Robot 的 USB 接到板子，与 PC 一样。
@@ -87,6 +102,48 @@ df -h
 ### Robot 环境
 
 见『[准备/软件](../README.md)』，安装 Robot 环境。
+
+如果挂载了硬盘 /mnt/nvme/，可以都往里安装：
+
+```bash
+# 安装 conda
+wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh -b -p /mnt/nvme/miniforge3
+/mnt/nvme/miniforge3/bin/conda init
+
+# 配置 conda 缓存
+mkdir -p /mnt/nvme/conda_cache/{pkgs,envs}
+conda config --add pkgs_dirs /mnt/nvme/conda_cache/pkgs
+conda config --add envs_dirs /mnt/nvme/conda_cache/envs
+
+# 配置 pip 缓存
+mkdir -p /mnt/nvme/pip_cache
+pip config set global.cache-dir /mnt/nvme/pip_cache
+
+# 配置 pip 镜像
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+```
+<!--
+在安装 lerobot 之前，可以先安装 PyTorch CPU 版，省掉安装 CUDA 版相关环境。 ✕
+(过高版本，被重装了；对应 lerobot 依赖版本要求再试)
+-->
+<!--
+mkdir /mnt/nvme/Codes
+ln -s /mnt/nvme/Codes ~/Codes
+-->
+
+更多：
+
+- pynput 监听不到本地键盘事件，在 SSH 或 RDP Wayland 远程下启动脚本时
+  - 上显示器、键盘，直接操作  ✕
+
+    ```bash
+    $ echo $XDG_SESSION_TYPE
+    wayland
+    ```
+
+  - 上蓝牙模块再 Joycon 遥操作  ?
+  - 上 WiFi 模块再实现远程控制  ✓
 
 ### Docker 环境
 

@@ -8,6 +8,11 @@ cd lerobot
 
 # ModuleNotFoundError: No module named 'zmq'
 pip install pyzmq
+
+# ImportError: 'rerun-sdk'
+pip install 'lerobot[viz]'
+# ImportError: 'pynput'
+pip install 'lerobot[pynput-dep]'
 ```
 
 ## 准备
@@ -26,13 +31,13 @@ sudo usermod -a -G dialout $USER
 lerobot-find-port
 
 # 单轮：进如下文件，修改port1与port2的名称
-#  lerobot/robots/xlerobot/config_xlerobot.py
+#  src/lerobot/robots/xlerobot/config_xlerobot.py
 class XLerobotConfig(RobotConfig):
     port1: str = "/dev/ttyACM0"  # port to connect to the bus (so101 + head camera)
     port2: str = "/dev/ttyACM1"  # port to connect to the bus (same as lekiwi setup)
 
 # 两轮：进如下文件，修改port1与port2的名称
-#  lerobot/robots/xlerobot_2wheels/config_xlerobot_2wheels.py
+#  src/lerobot/robots/xlerobot_2wheels/config_xlerobot_2wheels.py
 class XLerobot2WheelsConfig(RobotConfig):
     port1: str = "/dev/ttyACM0"  # port to connect to the bus (so101 + head camera)
     port2: str = "/dev/ttyACM1"  # port to connect to the bus (arms + 2 wheels)
