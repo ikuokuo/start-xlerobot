@@ -168,3 +168,22 @@ $ sudo systemctl restart docker
 <!--
 https://github.com/dusty-nv/jetson-containers/blob/master/docs/setup.md
 -->
+
+### ROS 2 环境
+
+ROS 2 Jazzy Jalisco (for Ubuntu 24.04),
+
+- Installation: https://docs.ros.org/en/jazzy/Installation.html
+  - deb packages: https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html
+
+按照上述文档安装好 ros-jazzy-desktop 后，如下确认测试正常：
+
+```bash
+# In one terminal, source the setup file and then run a C++ talker:
+source /opt/ros/jazzy/setup.bash
+ros2 run demo_nodes_cpp talker
+
+# In another terminal source the setup file and then run a Python listener:
+source /opt/ros/jazzy/setup.bash
+ros2 run demo_nodes_py listener
+```
