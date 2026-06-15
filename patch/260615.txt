@@ -1,0 +1,5 @@
+# XLeRobot
+commit 51ca0ec31bdb48713b94bacdba828bf8d889296b + 260615.patch 260615_cam.patch
+
+# lerobot
+commit 8515d456be1dbef8c133f07188c785e683eca899

@@ -1,0 +1,133 @@
+diff --git a/software/src/robots/xlerobot_2wheels/xlerobot_2wheels_host.py b/software/src/robots/xlerobot_2wheels/xlerobot_2wheels_host.py
+index d4988b6..4c9cf3b 100644
+--- a/software/src/robots/xlerobot_2wheels/xlerobot_2wheels_host.py
++++ b/software/src/robots/xlerobot_2wheels/xlerobot_2wheels_host.py
+@@ -80,21 +80,24 @@ class XLerobot2WheelsHost:
+         try:
+             while self._is_running:
+                 loop_start = time.time()
+-                
++
++                cmd_received = False
++
+                 # Check for commands with timeout
+                 if self.zmq_cmd_socket.poll(timeout=1):  # 1ms timeout
+                     try:
+                         cmd_string = self.zmq_cmd_socket.recv_string(zmq.NOBLOCK)
+                         cmd = json.loads(cmd_string)
+                         self._process_command(cmd)
++                        cmd_received = True
+                         self.last_cmd_time = time.time()
+                     except zmq.Again:
+                         pass  # No command available
+                     except json.JSONDecodeError as e:
+                         logger.error(f"Failed to decode command: {e}")
+-                
+-                # Check watchdog timeout
+-                if time.time() - self.last_cmd_time > self.host_config.watchdog_timeout_ms / 1000.0:
++
++                # Check watchdog timeout — only if NO command was received this cycle
++                if not cmd_received and time.time() - self.last_cmd_time > self.host_config.watchdog_timeout_ms / 1000.0:
+                     logger.warning("Watchdog timeout - stopping base motors")
+                     self.robot.stop_base()
+                     self.last_cmd_time = time.time()  # Reset to avoid spam
+@@ -125,6 +128,26 @@ class XLerobot2WheelsHost:
+     def _process_command(self, cmd: dict[str, Any]):
+         """Process a received command"""
+         try:
++            # Handle PING from web_control RemoteCore
++            if cmd.get("command") == "ping":
++                pong = json.dumps({
++                    "type": "response",
++                    "response": "pong",
++                    "data": {},
++                    "timestamp": time.time()
++                })
++                self.zmq_observation_socket.send_string(pong)
++                return
++
++            # Debug: show received action and wheel commands
++            base_goal_vel = {k: v for k, v in cmd.items() if k.endswith(".vel")}
++            if base_goal_vel:
++                wheel_cmd = self.robot._body_to_wheel_raw(
++                    base_goal_vel.get("x.vel", 0.0),
++                    base_goal_vel.get("theta.vel", 0.0),
++                )
++                print(f"[HOST] action={cmd} → base_vel={base_goal_vel} → wheels={wheel_cmd}")
++
+             # Send command to robot
+             self.robot.send_action(cmd)
+         except Exception as e:
+@@ -188,17 +211,17 @@ def main():
+     
+     # Create configs
+     robot_config = XLerobot2WheelsConfig(
+-        id=args.robot.id,
+-        port1=args.robot.port1,
+-        port2=args.robot.port2,
++        id=getattr(args, "robot.id"),
++        port1=getattr(args, "robot.port1"),
++        port2=getattr(args, "robot.port2"),
+     )
+-    
++
+     host_config = XLerobot2WheelsHostConfig(
+-        port_zmq_cmd=args.host.port_zmq_cmd,
+-        port_zmq_observations=args.host.port_zmq_observations,
+-        connection_time_s=args.host.connection_time_s,
+-        watchdog_timeout_ms=args.host.watchdog_timeout_ms,
+-        max_loop_freq_hz=args.host.max_loop_freq_hz,
++        port_zmq_cmd=getattr(args, "host.port_zmq_cmd"),
++        port_zmq_observations=getattr(args, "host.port_zmq_observations"),
++        connection_time_s=getattr(args, "host.connection_time_s"),
++        watchdog_timeout_ms=getattr(args, "host.watchdog_timeout_ms"),
++        max_loop_freq_hz=getattr(args, "host.max_loop_freq_hz"),
+     )
+     
+     # Create and run host
+diff --git a/web_control/server/core/remote_core.py b/web_control/server/core/remote_core.py
+index 0388c4a..e7e2b48 100644
+--- a/web_control/server/core/remote_core.py
++++ b/web_control/server/core/remote_core.py
+@@ -7,6 +7,7 @@ with robot hosts via ZeroMQ.
+ """
+ 
+ import asyncio
++import json
+ import logging
+ import time
+ from typing import Any, Dict, List, Optional
+@@ -151,8 +152,31 @@ class RemoteCore:
+             # Validate inputs
+             speed = max(0.0, min(1.0, speed))  # Clamp speed to [0, 1]
+ 
+-            # Send move command
+-            cmd_data = RobotProtocol.encode_move_command(direction, speed)
++            # Map direction to action dict expected by xlerobot send_action()
++            # Speed levels matching xlerobot_2wheels: linear 0.1~0.3, angular 30~90
++            linear_speed = speed * 0.3   # max 0.3 m/s
++            angular_speed = speed * 90   # max 90 deg/s
++
++            action = {}
++            if direction == 'forward':
++                action['theta.vel'] = angular_speed   # 前进
++            elif direction == 'backward':
++                action['theta.vel'] = -angular_speed  # 后退
++            elif direction == 'left':
++                action['x.vel'] = linear_speed        # 左转
++            elif direction == 'right':
++                action['x.vel'] = -linear_speed       # 右转
++            elif direction == 'rotate_left':
++                action['theta.vel'] = angular_speed
++            elif direction == 'rotate_right':
++                action['theta.vel'] = -angular_speed
++            elif direction == 'stop':
++                action['x.vel'] = 0.0
++                action['theta.vel'] = 0.0
++
++            # Send as raw JSON (not wrapped in RobotProtocol)
++            cmd_data = json.dumps(action).encode('utf-8')
++            print(f"[ZMQ SEND] {action} → {self.config.get_robot_cmd_address()}")
+             await self.cmd_socket.send(cmd_data)
+ 
+             self.logger.debug(f"Sent move command: {direction} @ {speed}")

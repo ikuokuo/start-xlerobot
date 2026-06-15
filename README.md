@@ -16,6 +16,7 @@
   - [安装 LeRobot](docs/sw_lerobot.md)
   - [手臂控制](docs/sw_arm.md)
   - [遥操作](docs/sw_teleop.md)
+  - [Web 远控](docs/sw_web_ctrl.md)
 
 ## 方案
 
